@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Teste SignalR</title>
+    	<script src="_js/jquery/jquery-2.1.4.js"></script>
+        <script src="_js/SignalR/jquery.signalR-2.1.2.js"></script>
+		<script src="http://192.168.1.16:8080/signalr/hubs"></script>
+</head>
+<body>
+    <h1>Teste SignaR</h1>
+    <script type="text/javascript">
+        $(function() {
+            
+            // CONECTA NA URL GERADA PELO SERVI�O DO SIGNALR
+			$.connection.hub.url = "http://192.168.1.16:8080/signalr";
+
+			//CRIO UMA CONEXAO COM O HUB CRIADO LA NO C#
+			var conexaoApplicationAbcHub = $.connection.applicationAbcHub;
+			
+			// RECEBE AS MENSAGENS
+			conexaoApplicationAbcHub.client.sendMessage = function(msg) {
+				alert(msg);
+			};
+			
+            // INICIA UMA CONEXAO AO CARREGAR UMA PAGINA
+            $.connection.hub.start().done(function () {
+
+				//ENTRO NO GRUPO ABC
+				conexaoApplicationAbcHub.server.joinGroup("grupoAbc");
+			
+                // CLICO NO BOTAO PARA ENVIAR MENSAGEM PARA O GRUPO
+                $('#btnEnviarMensagem').click(function() {
+                    
+					//PEGA MENSAGEM DIGITADA
+					var msg = $('#txtMensagem').val();
+					
+					//ENVIA MENSAGEM PARA TODOS QUE ESTIVEREM OUVINDO O GRUPOABC
+                    conexaoApplicationAbcHub.server.sendMessage("grupoAbc", msg);
+                });
+            });
+        });
+    </script>
+	<input type="text" id="txtMensagem" value="oi">
+    <input type="button" value="Enviar Mensagem" id="btnEnviarMensagem">
+</body>
+</html>
